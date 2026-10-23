@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="nyarHtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>NYAR MARKET | منصة التجارة العالمية B2B2C</title>
+    <meta name="description" content="NYAR MARKET — منصة تجارة إلكترونية عالمية متعددة التجار، تعمل في اليمن والخليج والعالم.">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Cinzel:wght@500;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ================= الهيدر ================= -->
+    <header class="cyber-header">
+        <a class="nyar-logo-container" id="logoHome" onclick="switchView('home')">
+            <div class="royal-crown-badge"><i class="fas fa-crown"></i></div>
+            <div class="nyar-text-zone">
+                <span class="nyar-title-main">NYAR MARKET</span>
+                <span class="nyar-subtitle-global" data-i18n="tagline">GLOBAL B2B2C MARKETPLACE</span>
+            </div>
+        </a>
+
+        <div class="header-actions">
+            <!-- اختيار السوق (الدولة) -->
+            <select class="header-select" id="marketSelect" onchange="changeMarket()" title="السوق">
+                <option value="YE" data-i18n="marketYE">🇾🇪 اليمن</option>
+                <option value="SA" data-i18n="marketSA">🇸🇦 السعودية</option>
+                <option value="AE" data-i18n="marketAE">🇦🇪 الإمارات</option>
+                <option value="INTL" data-i18n="marketINTL">🌍 دول العالم</option>
+            </select>
+            <!-- اختيار العملة -->
+            <select class="header-select" id="currencySelect" onchange="changeCurrency()">
+                <option value="YER">YER</option>
+                <option value="USD">USD</option>
+                <option value="SAR">SAR</option>
+                <option value="AED">AED</option>
+            </select>
+            <!-- اللغة -->
+            <button class="header-btn" id="langBtn" onclick="toggleLanguage()" title="Language"><i class="fas fa-globe"></i> <span class="btn-text" id="langBtnText">EN</span></button>
+            <!-- الثيم -->
+            <button class="header-btn" onclick="toggleTheme()" title="Theme"><i class="fas fa-moon" id="themeIcon"></i></button>
+            <!-- الدخول / المستخدم -->
+            <button class="header-btn blue" id="authBtn" onclick="handleAuthClick()"><i class="fas fa-user"></i> <span class="btn-text" data-i18n="login">تسجيل</span></button>
+            <!-- البائع -->
+            <button class="header-btn primary" id="vendorHeaderBtn" onclick="handleVendorClick()"><i class="fas fa-store"></i> <span class="btn-text" data-i18n="sell">بيع معنا</span></button>
+            <!-- السلة -->
+            <div class="cart-icon-wrapper" onclick="switchView('cart')" title="Cart">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="cart-badge" id="cartBadge">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= التبويبات ================= -->
+    <nav class="luxury-tabs" id="mainTabs">
+        <button class="tab-item active" data-view="home" onclick="switchView('home')"><i class="fas fa-home"></i> <span data-i18n="tabHome">الرئيسية</span></button>
+        <button class="tab-item" data-view="store" onclick="switchView('store')"><i class="fas fa-gem"></i> <span data-i18n="tabStore">المتجر</span></button>
+        <button class="tab-item" data-view="stores" onclick="switchView('stores')"><i class="fas fa-store"></i> <span data-i18n="tabStores">المتاجر</span></button>
+        <button class="tab-item" data-view="cart" onclick="switchView('cart')"><i class="fas fa-shopping-cart"></i> <span data-i18n="tabCart">السلة</span></button>
+        <button class="tab-item" data-view="orders" onclick="switchView('orders')"><i class="fas fa-box"></i> <span data-i18n="tabOrders">طلباتي</span></button>
+        <button class="tab-item" data-view="vendor" onclick="switchView('vendor')" style="display:none;"><i class="fas fa-user-tie"></i> <span data-i18n="tabVendor">لوحة البائع</span></button>
+        <button class="tab-item" data-view="admin" onclick="switchView('admin')" style="display:none;"><i class="fas fa-crown"></i> <span data-i18n="tabAdmin">المدير</span></button>
+    </nav>
+
+    <!-- ================= الرئيسية ================= -->
+    <main id="homeView" class="creative-view active">
+        <div class="hero-banner">
+            <div class="banner-slider">
+                <div class="banner-content">
+                    <div class="banner-market-chip" id="bannerMarketChip"></div>
+                    <h2 id="bannerTitle"></h2>
+                    <p id="bannerDesc"></p>
+                    <button class="action-buy-btn gold" style="width:auto;padding:0.8rem 2.2rem;" onclick="switchView('store')" data-i18n="shopNow">تسوق الآن</button>
+                </div>
+                <div class="banner-emoji" id="bannerEmoji">🛍️</div>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <h2 class="section-title"><i class="fas fa-th-large title-icon"></i> <span data-i18n="categories">الأقسام الرئيسية</span></h2>
+            <div class="categories-grid" id="categoriesGrid"></div>
+        </div>
+
+        <div class="section-container" id="flashSection" style="display:none;">
+            <div class="flash-section-header">
+                <h2 class="section-title" style="margin-bottom:0;"><i class="fas fa-bolt title-icon"></i> <span data-i18n="flashDeals">عروض الفلاش</span></h2>
+                <div class="flash-countdown" id="flashCountdown"></div>
+            </div>
+            <div class="products-grid" id="flashProducts"></div>
+        </div>
+
+        <div class="section-container">
+            <h2 class="section-title"><i class="fas fa-star title-icon"></i> <span data-i18n="featured">منتجات مميزة</span></h2>
+            <div class="products-grid" id="featuredProducts"></div>
+        </div>
+
+        <div class="section-container">
+            <h2 class="section-title"><i class="fas fa-fire title-icon"></i> <span data-i18n="bestSellers">الأكثر مبيعاً</span></h2>
+            <div class="products-grid" id="bestSellerProducts"></div>
+        </div>
+
+        <div class="section-container">
+            <h2 class="section-title"><i class="fas fa-tags title-icon"></i> <span data-i18n="onSale">عروض خاصة</span></h2>
+            <div class="products-grid" id="onSaleProducts"></div>
+        </div>
+    </main>
+
+    <!-- ================= المتجر ================= -->
+    <main id="storeView" class="creative-view">
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" data-i18n-ph="searchPh" placeholder="🔍 بحث عن منتج أو تاجر..." oninput="applyFilters()">
+                <select class="filter-select" id="filterCategory" onchange="applyFilters()"></select>
+                <select class="filter-select" id="filterPrice" onchange="applyFilters()">
+                    <option value="all" data-i18n="allPrices">كل الأسعار</option>
+                    <option value="0-50">0 - 50$</option>
+                    <option value="50-200">50 - 200$</option>
+                    <option value="200-1000">200 - 1000$</option>
+                    <option value="1000-999999">1000$+</option>
+                </select>
+                <select class="filter-select" id="filterRating" onchange="applyFilters()">
+                    <option value="all" data-i18n="allRatings">كل التقييمات</option>
+                    <option value="4" data-i18n="fourPlus">4 نجوم فأكثر</option>
+                    <option value="3" data-i18n="threePlus">3 نجوم فأكثر</option>
+                </select>
+            </div>
+        </div>
+        <div class="section-container">
+            <div class="products-grid" id="storeProductsGrid"></div>
+        </div>
+    </main>
+
+    <!-- ================= دليل المتاجر ================= -->
+    <main id="storesView" class="creative-view">
+        <div class="section-container">
+            <h2 class="section-title"><i class="fas fa-store title-icon"></i> <span data-i18n="storesDirectory">دليل المتاجر والتجار</span></h2>
+            <div class="products-grid" id="storesGrid"></div>
+        </div>
+    </main>
+
+    <!-- ================= صفحة متجر تاجر ================= -->
+    <main id="shopView" class="creative-view">
+        <div class="section-container">
+            <div class="store-hero" id="shopHero"></div>
+        </div>
+        <div class="section-container" style="padding-top:0;">
+            <h2 class="section-title"><i class="fas fa-boxes title-icon"></i> <span data-i18n="storeProducts">منتجات المتجر</span></h2>
+            <div class="products-grid" id="shopProductsGrid"></div>
+        </div>
+    </main>
+
+    <!-- ================= السلة ================= -->
+    <main id="cartView" class="creative-view">
+        <div class="section-container">
+            <h2 class="section-title"><i class="fas fa-shopping-cart title-icon"></i> <span data-i18n="cartTitle">حقيبة المشتريات</span></h2>
+            <div id="cartItemsContainer"></div>
+            <div id="cartSummary"></div>
+            <div style="max-width:640px;margin:1.5rem auto 0;">
+                <button class="action-buy-btn gold" id="goCheckoutBtn" onclick="openCheckout()" style="font-size:16px;padding:1.1rem;">
+                    <i class="fas fa-lock"></i> <span data-i18n="proceedCheckout">إتمام الطلب بأمان</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ================= طلباتي ================= -->
+    <main id="ordersView" class="creative-view">
+        <div class="section-container">
+            <h2 class="section-title"><i class="fas fa-box title-icon"></i> <span data-i18n="myOrders">طلباتي</span></h2>
+            <div id="buyerOrdersList"></div>
+        </div>
+    </main>
+
+    <!-- ================= لوحة البائع ================= -->
+    <main id="vendorView" class="creative-view">
+        <div class="section-container">
+            <h2 class="section-title"><i class="fas fa-user-tie title-icon"></i> <span data-i18n="vendorDashboard">لوحة تحكم البائع</span></h2>
+            <div class="panel-grid">
+                <div class="stat-card"><div class="stat-value" id="vendorSales">0</div><div class="stat-label" data-i18n="completedOrders">الطلبات المكتملة</div></div>
+                <div class="stat-card"><div class="stat-value" id="vendorRevenue">0</div><div class="stat-label" data-i18n="netEarnings">صافي الأرباح</div></div>
+                <div class="stat-card"><div class="stat-value" id="vendorCommissionPaid">0</div><div class="stat-label" data-i18n="platformCommission">عمولة المنصة</div></div>
+                <div class="stat-card"><div class="stat-value" id="vendorProducts">0</div><div class="stat-label" data-i18n="myProducts">منتجاتي</div></div>
+            </div>
+
+            <div class="panel-card">
+                <h3><i class="fas fa-plus-circle"></i> <span data-i18n="addProduct">إضافة منتج جديد</span></h3>
+                <div class="form-grid">
+                    <input type="text" id="vProdTitle" class="luxury-input" data-i18n-ph="prodNamePh" placeholder="اسم المنتج">
+                    <input type="number" id="vProdPrice" class="luxury-input" data-i18n-ph="prodPricePh" placeholder="السعر (دولار $)">
+                    <select id="vProdCategory" class="luxury-input"></select>
+                    <input type="text" id="vProdIcon" class="luxury-input" data-i18n-ph="prodIconPh" placeholder="أيقونة (إيموجي) مثال: 📱">
+                </div>
+                <textarea id="vProdDesc" class="luxury-input" data-i18n-ph="prodDescPh" placeholder="وصف المنتج"></textarea>
+                <button onclick="vendorAddProduct()" class="action-buy-btn blue" style="width:auto;padding:0.8rem 2rem;" data-i18n="publishProduct">نشر المنتج في السوق</button>
+            </div>
+
+            <h3 style="color:#D4AF37;margin-bottom:1rem;" data-i18n="myProductsList">📋 منتجاتي</h3>
+            <div id="vendorProductsList"></div>
+
+            <h3 style="color:#D4AF37;margin:1.5rem 0 1rem;" data-i18n="myOrdersList">📊 طلبات متجري</h3>
+            <div id="vendorOrdersList"></div>
+
+            <h3 style="color:#D4AF37;margin:1.5rem 0 1rem;" data-i18n="storeSettings">⚙️ إعدادات المتجر</h3>
+            <div class="panel-card">
+                <div class="form-grid">
+                    <input type="text" id="vendorStoreNameEdit" class="luxury-input" data-i18n-ph="storeNamePh" placeholder="اسم المتجر">
+                    <input type="text" id="vendorLogoEdit" class="luxury-input" data-i18n-ph="storeLogoPh" placeholder="شعار المتجر (إيموجي) 🏪">
+                </div>
+                <div class="form-grid">
+                    <input type="text" id="vendorJibWallet" class="luxury-input" placeholder="رقم محفظة جيب">
+                    <input type="text" id="vendorKrimiWallet" class="luxury-input" placeholder="رقم محفظة كريمي">
+                </div>
+                <button onclick="saveVendorSettings()" class="action-buy-btn" style="width:auto;padding:0.8rem 2rem;" data-i18n="saveSettings">حفظ الإعدادات</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ================= لوحة المدير ================= -->
+    <main id="adminView" class="creative-view">
+        <div class="section-container">
+            <h2 class="section-title"><i class="fas fa-crown title-icon"></i> <span data-i18n="adminPanel">لوحة مدير المنصة</span></h2>
+            <div class="panel-grid">
+                <div class="stat-card"><div class="stat-value" id="adminUsers">0</div><div class="stat-label" data-i18n="users">المستخدمون</div></div>
+                <div class="stat-card"><div class="stat-value" id="adminVendors">0</div><div class="stat-label" data-i18n="vendors">التجار</div></div>
+                <div class="stat-card"><div class="stat-value" id="adminOrders">0</div><div class="stat-label" data-i18n="orders">الطلبات</div></div>
+                <div class="stat-card"><div class="stat-value" id="adminRevenue">0</div><div class="stat-label" data-i18n="nyarCommission">عمولات NYAR</div></div>
+            </div>
+
+            <div class="panel-card">
+                <h3><i class="fas fa-percentage"></i> <span data-i18n="commissionSettings">إعدادات عمولة المنصة</span></h3>
+                <div style="display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap;">
+                    <input type="number" id="commissionRateInput" class="luxury-input" style="max-width:160px;margin-bottom:0;" placeholder="%" min="0" max="100">
+                    <button onclick="updateCommission()" class="mini-btn gold" data-i18n="updateRate">تحديث النسبة</button>
+                    <button onclick="exportAllData()" class="mini-btn gray"><i class="fas fa-download"></i> <span data-i18n="exportData">تصدير البيانات</span></button>
+                </div>
+            </div>
+
+            <div class="panel-card">
+                <h3><i class="fas fa-bolt"></i> <span data-i18n="createFlashDeal">إنشاء عرض فلاش</span></h3>
+                <div class="form-grid">
+                    <select id="flashProductSelect" class="luxury-input"></select>
+                    <input type="number" id="flashDiscount" class="luxury-input" data-i18n-ph="flashDiscountPh" placeholder="نسبة الخصم %" min="1" max="90">
+                    <input type="number" id="flashHours" class="luxury-input" data-i18n-ph="flashHoursPh" placeholder="المدة بالساعات" min="1" max="168">
+                </div>
+                <button onclick="createFlashDeal()" class="mini-btn red"><i class="fas fa-bolt"></i> <span data-i18n="launchDeal">إطلاق العرض</span></button>
+            </div>
+
+            <h3 style="color:#D4AF37;margin-bottom:1rem;" data-i18n="manageVendors">📋 إدارة التجار</h3>
+            <div id="adminVendorsList"></div>
+
+            <h3 style="color:#D4AF37;margin:1.5rem 0 1rem;" data-i18n="allOrders">📊 جميع الطلبات</h3>
+            <div id="adminOrdersList"></div>
+
+            <h3 style="color:#D4AF37;margin:1.5rem 0 1rem;" data-i18n="payouts">💸 تحويلات التجار</h3>
+            <div id="adminPayoutsList"></div>
+        </div>
+    </main>
+
+    <!-- ================= الفوتر ================= -->
+    <footer class="cyber-footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>NYAR MARKET</h4>
+                <p data-i18n="footerAbout">منصة تجارة إلكترونية عالمية متعددة التجار، تربط التاجر بالمشتري في اليمن والخليج والعالم مع دفع هجين وشحن ذكي.</p>
+            </div>
+            <div class="footer-col">
+                <h4 data-i18n="footerLinks">روابط سريعة</h4>
+                <a onclick="switchView('store')" data-i18n="tabStore">المتجر</a>
+                <a onclick="switchView('stores')" data-i18n="tabStores">المتاجر</a>
+                <a onclick="handleVendorClick()" data-i18n="becomeVendor">كن تاجراً</a>
+            </div>
+            <div class="footer-col">
+                <h4 data-i18n="footerLegal">الشؤون القانونية</h4>
+                <a href="legal.html" target="_blank" data-i18n="terms">الشروط والأحكام</a>
+                <a href="legal.html#privacy" target="_blank" data-i18n="privacy">سياسة الخصوصية</a>
+                <a href="legal.html#returns" target="_blank" data-i18n="returnsPolicy">سياسة الاسترجاع (48 ساعة)</a>
+            </div>
+            <div class="footer-col">
+                <h4 data-i18n="footerMarkets">الأسواق والدفع</h4>
+                <p data-i18n="footerPayments">اليمن: جيب، كريمي، ون كاش، فلوسك، محفظتي، والدفع عند الاستلام.<br>عالمياً: Visa، MasterCard، PayPal، Apple Pay.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">© 2026 NYAR MARKET — <span data-i18n="rights">جميع الحقوق محفوظة</span></div>
+    </footer>
+
+    <!-- ================= نافذة تسجيل الدخول ================= -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+            <h2 class="modal-title" data-i18n="loginTitle">تسجيل الدخول</h2>
+            <input type="email" class="luxury-input" data-i18n-ph="emailPh" placeholder="البريد الإلكتروني" id="loginEmail">
+            <input type="password" class="luxury-input" data-i18n-ph="passwordPh" placeholder="كلمة المرور" id="loginPassword">
+            <button class="action-buy-btn gold" onclick="login()" data-i18n="loginBtn">دخول</button>
+            <p style="margin-top:1rem;text-align:center;color:var(--text-muted);cursor:pointer;" onclick="closeModal('loginModal');openModal('registerModal');" data-i18n="createAccount">إنشاء حساب جديد</p>
+        </div>
+    </div>
+
+    <!-- ================= نافذة إنشاء حساب ================= -->
+    <div class="modal-overlay" id="registerModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
+            <h2 class="modal-title" data-i18n="registerTitle">إنشاء حساب</h2>
+            <input type="text" class="luxury-input" data-i18n-ph="namePh" placeholder="الاسم الكامل" id="regName">
+            <input type="email" class="luxury-input" data-i18n-ph="emailPh" placeholder="البريد الإلكتروني" id="regEmail">
+            <input type="password" class="luxury-input" data-i18n-ph="passwordPh" placeholder="كلمة المرور" id="regPassword">
+            <select class="luxury-input" id="regRole">
+                <option value="buyer" data-i18n="roleBuyer">مشتري</option>
+                <option value="vendor" data-i18n="roleVendor">تاجر / بائع</option>
+            </select>
+            <button class="action-buy-btn gold" onclick="register()" data-i18n="registerBtn">إنشاء الحساب</button>
+        </div>
+    </div>
+
+    <!-- ================= نافذة تسجيل تاجر ================= -->
+    <div class="modal-overlay" id="vendorRegisterModal">
+        <div class="modal-box wide">
+            <button class="modal-close" onclick="closeModal('vendorRegisterModal')">&times;</button>
+            <h2 class="modal-title" data-i18n="vendorRegTitle">تسجيل تاجر جديد</h2>
+            <h3 style="color:var(--accent-blue);margin-bottom:1rem;" data-i18n="businessInfo">📋 معلومات النشاط التجاري</h3>
+            <div class="form-grid">
+                <input type="text" id="vendorFullName" class="luxury-input" data-i18n-ph="ownerNamePh" placeholder="اسم مالك النشاط*">
+                <input type="text" id="vendorStoreNameReg" class="luxury-input" data-i18n-ph="storeNamePh" placeholder="اسم المتجر*">
+            </div>
+            <select id="vendorBusinessType" class="luxury-input"></select>
+            <h3 style="color:var(--accent-blue);margin:1rem 0;" data-i18n="businessAddress">📍 عنوان النشاط</h3>
+            <select id="vendorCity" class="luxury-input"></select>
+            <input type="text" id="vendorStreet" class="luxury-input" data-i18n-ph="streetPh" placeholder="الشارع / الحي*">
+            <h3 style="color:var(--accent-blue);margin:1rem 0;" data-i18n="vendorWallets">📱 المحافظ الإلكترونية (لاستلام الأرباح)</h3>
+            <div class="form-grid">
+                <input type="text" id="vendorJibWalletReg" class="luxury-input" placeholder="رقم جيب">
+                <input type="text" id="vendorKrimiWalletReg" class="luxury-input" placeholder="رقم كريمي">
+            </div>
+            <button onclick="registerVendor()" class="action-buy-btn gold" data-i18n="registerVendorBtn">تسجيل التاجر</button>
+        </div>
+    </div>
+
+    <!-- ================= نافذة تفاصيل المنتج ================= -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal-box wide" style="padding:0;overflow:hidden;">
+            <button class="modal-close" onclick="closeModal('productModal')" style="background:rgba(0,0,0,0.7);color:#fff;width:38px;height:38px;border-radius:50%;">&times;</button>
+            <div style="background:linear-gradient(135deg,#1E293B,#0F172A);padding:2.5rem;text-align:center;min-height:180px;display:flex;align-items:center;justify-content:center;">
+                <span id="productMainEmoji" style="font-size:130px;"></span>
+            </div>
+            <div style="padding:2rem;">
+                <h2 id="productDetailTitle" style="font-size:1.4rem;font-weight:800;margin-bottom:0.5rem;"></h2>
+                <div class="rating-stars" id="productDetailRating" style="font-size:15px;margin-bottom:0.5rem;"></div>
+                <div class="price-row" style="font-size:1.4rem;">
+                    <span class="premium-price-tag" id="productDetailPrice"></span>
+                    <span class="original-price" id="productDetailOriginalPrice"></span>
+                </div>
+                <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:var(--radius-md);padding:0.8rem 1rem;margin-bottom:1rem;">
+                    <span style="color:var(--accent-green);font-size:14px;" id="deliveryEstimate"></span>
+                </div>
+                <p id="productDetailDescription" style="color:var(--text-muted);line-height:1.8;margin-bottom:1rem;"></p>
+                <div id="vendorCardContainer"></div>
+                <button id="btnAddToCart" class="action-buy-btn gold" style="padding:1.1rem;font-size:17px;"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= نافذة إتمام الطلب (الدفع الهجين) ================= -->
+    <div class="modal-overlay" id="checkoutModal">
+        <div class="modal-box wide">
+            <button class="modal-close" onclick="closeModal('checkoutModal')">&times;</button>
+            <h2 class="modal-title"><i class="fas fa-shopping-bag"></i> <span data-i18n="checkoutTitle">إتمام الطلب</span></h2>
+
+            <!-- ملخص المنتجات -->
+            <div class="panel-card" style="padding:1rem;margin-bottom:1.2rem;">
+                <p style="color:var(--text-muted);font-size:13px;margin-bottom:0.5rem;" data-i18n="orderSummary">📦 ملخص الطلب</p>
+                <div id="checkoutItemsList"></div>
+            </div>
+
+            <!-- بيانات العميل -->
+            <div class="form-grid">
+                <div>
+                    <label class="input-label" data-i18n="fullName">الاسم الكامل *</label>
+                    <input type="text" id="coName" class="luxury-input" data-i18n-ph="fullNamePh" placeholder="أدخل اسمك الكامل">
+                </div>
+                <div>
+                    <label class="input-label" data-i18n="phone">رقم الهاتف *</label>
+                    <input type="tel" id="coPhone" class="luxury-input" placeholder="7XXXXXXXX">
+                </div>
+            </div>
+
+            <!-- اختيار دولة الشحن -->
+            <label class="input-label" data-i18n="shippingCountry">دولة الشحن *</label>
+            <select id="coCountry" class="luxury-input" onchange="renderCheckoutAddress()">
+                <option value="YE" data-i18n="marketYE">🇾🇪 اليمن</option>
+                <option value="SA" data-i18n="marketSA">🇸🇦 السعودية</option>
+                <option value="AE" data-i18n="marketAE">🇦🇪 الإمارات</option>
+                <option value="INTL" data-i18n="marketINTL">🌍 دولة أخرى</option>
+            </select>
+
+            <!-- حقول العنوان الديناميكية -->
+            <div id="checkoutAddressFields"></div>
+
+            <!-- خيارات الشحن -->
+            <label class="input-label" data-i18n="shippingMethod">طريقة الشحن *</label>
+            <div id="checkoutShippingOptions"></div>
+
+            <!-- طرق الدفع الهجينة -->
+            <label class="input-label" style="margin-top:0.8rem;" data-i18n="paymentMethod">طريقة الدفع *</label>
+            <div class="wallet-buttons" id="checkoutPaymentOptions"></div>
+            <div class="wallet-instructions" id="paymentInstructions" style="display:none;"></div>
+
+            <!-- الكوبون -->
+            <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+                <input type="text" id="couponInput" class="luxury-input" style="margin-bottom:0;" data-i18n-ph="couponPh" placeholder="كود خصم (مثال: NYAR10)">
+                <button class="mini-btn gold" onclick="applyCoupon()" data-i18n="apply">تطبيق</button>
+            </div>
+
+            <!-- ملخص السعر -->
+            <div class="summary-card" id="checkoutPriceSummary"></div>
+
+            <button class="action-buy-btn gold" onclick="placeOrder()" style="padding:1.1rem;font-size:16px;" data-i18n="confirmOrder">✅ تأكيد الطلب</button>
+            <p style="color:var(--text-dim);font-size:11px;text-align:center;margin-top:0.8rem;">
+                <span data-i18n="checkoutLegalNote">بإتمامك الطلب فأنت توافق على</span>
+                <a href="legal.html" target="_blank" style="color:var(--accent-blue);" data-i18n="terms">الشروط والأحكام</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- ================= الأزرار العائمة: الصوت وذوي الهمم ================= -->
+    <div class="floating-controls">
+        <button type="button" class="float-btn mic" id="micBtn" onclick="startVoiceInput()" title="تحدث مع المساعد الذكي">🎙️</button>
+        <button type="button" class="float-btn a11y" id="a11yBtn" onclick="toggleAccessibilityPanel()" title="وضع ذوي الهمم">♿</button>
+    </div>
+
+    <!-- لوحة إعدادات ذوي الهمم -->
+    <div class="a11y-panel" id="a11yPanel">
+        <h4 data-i18n="a11yTitle">♿ وضع ذوي الهمم</h4>
+        <div class="a11y-toggle-row">
+            <span data-i18n="a11ySpeech">القراءة الصوتية</span>
+            <label class="switch"><input type="checkbox" id="a11ySpeechToggle" onchange="toggleA11ySpeech()"><span class="slider"></span></label>
+        </div>
+        <div class="a11y-toggle-row">
+            <span data-i18n="a11yContrast">التباين العالي</span>
+            <label class="switch"><input type="checkbox" id="a11yContrastToggle" onchange="toggleA11yContrast()"><span class="slider"></span></label>
+        </div>
+        <div class="a11y-toggle-row">
+            <span data-i18n="a11yLargeText">تكبير النصوص</span>
+            <label class="switch"><input type="checkbox" id="a11yLargeToggle" onchange="toggleA11yLargeText()"><span class="slider"></span></label>
+        </div>
+    </div>
+
+    <!-- ================= المساعد الذكي n8n ================= -->
+    <script type="module">
+        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+        createChat({
+            webhookUrl: 'https://nyar-agent.app.n8n.cloud/webhook/4070d856-8863-4764-9012-fb972741079e/chat',
+            style: {
+                '--chat--color-primary': '#D4AF37',
+                '--chat--color-primary-shade-50': '#C5A028',
+                '--chat--color-primary-shade-100': '#B69119',
+                '--chat--color-light': '#FFFFFF'
+            }
+        });
+    </script>
+
+    <script src="app.js"></script>
+</body>
+</html>
